@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 ```
 import pKd
-from pKd import predict_from_txt_files
+from pKd import predict_pKd_from_txt
 
 ```
 # Predict
@@ -44,6 +44,6 @@ from pKd import predict_from_txt_files
 
 
 ```
-predict_from_txt_files(sequences_path,smiles_path)
+predict_pKd_from_txt(sequences_path,smiles_path)
 
 ```
