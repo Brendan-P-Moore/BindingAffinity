@@ -84,7 +84,7 @@ def chembl_to_smiles(df):
     ]
     num_processes = cpu_count()
     with Pool(num_processes) as pool:
-        for result in tqdm(pool.imap_unordered(process_batch_with_progress, chembl_id_batches), total=len(chembl_id_batches)):
+        for result in tqdm(pool.imap_unordered(process_batch, chembl_id_batches), total=len(chembl_id_batches)):
             results.append(result)
     merged_results = {}
     for d in results:
