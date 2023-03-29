@@ -9,6 +9,7 @@ from joblib import dump, load
 import os
 import tqdm
 from tqdm import tqdm
+import itertools
 
 import rdkit
 from rdkit import Chem
@@ -34,6 +35,19 @@ from scipy.stats import spearmanr
 from autogluon.features.generators import AutoMLPipelineFeatureGenerator
 from autogluon.tabular import FeatureMetadata
 from autogluon.tabular import TabularDataset, TabularPredictor
+
+
+def drug_target_pairs(sequences_path, smiles_path):
+    fasta_df = pd.read_csv(os.path.abspath(sequences_path), names=["sequence"])
+
+    smiles_df = pd.read_csv(os.path.abspath(smiles_path), names=["compound_smiles"])
+
+    combinations = list(
+        itertools.product(fasta_df["sequence"], smiles_df["compound_smiles"])
+    )
+
+    df = pd.DataFrame(combinations, columns=["sequence", "compound_smiles"])
+    return df
 
 
 def uniprot_to_fasta(df):
@@ -85,7 +99,10 @@ def chembl_to_smiles(df):
     num_processes = cpu_count()
     with Pool(num_processes) as pool:
         results = []
-        for result in tqdm(pool.imap_unordered(process_batch, chembl_id_batches), total=len(chembl_id_batches)):
+        for result in tqdm(
+            pool.imap_unordered(process_batch, chembl_id_batches),
+            total=len(chembl_id_batches),
+        ):
             results.append(result)
     merged_results = {}
     for d in results:
@@ -107,7 +124,9 @@ def smiles_to_rdkit_mol(df):
     return mols
 
 
-def fingerprint_generation(df, ncounts):  # returns a df with molecular fingerprints, ncounts is the number of count vectors.
+def fingerprint_generation(
+    df, ncounts
+):  # returns a df with molecular fingerprints, ncounts is the number of count vectors.
     mols = smiles_to_rdkit_mol(df)
     # fingerprint generation
     mfpgen = rdFingerprintGenerator.GetMorganGenerator(
@@ -118,21 +137,29 @@ def fingerprint_generation(df, ncounts):  # returns a df with molecular fingerpr
     )  # TopologicalTorsion300 Fingerprint
     mfp_matrix = np.zeros((len(mols), ncounts), dtype=int)
     tt_matrix = np.zeros((len(mols), ncounts), dtype=int)
-    mfp_fingerprints = [mfpgen.GetCountFingerprint(mol) for mol in tqdm(mols, desc="Generating Morgan fingerprints", unit=" molecule")]
-    tt_fingerprints = [ttgen.GetCountFingerprint(mol) for mol in tqdm(mols, desc="Generating Topological Torsion fingerprints", unit=" molecule")]
-    
+    mfp_fingerprints = [
+        mfpgen.GetCountFingerprint(mol)
+        for mol in tqdm(mols, desc="Generating Morgan fingerprints", unit=" molecule")
+    ]
+    tt_fingerprints = [
+        ttgen.GetCountFingerprint(mol)
+        for mol in tqdm(
+            mols, desc="Generating Topological Torsion fingerprints", unit=" molecule"
+        )
+    ]
+
     for i, fingerprint in enumerate(mfp_fingerprints):
         ConvertToNumpyArray(fingerprint, mfp_matrix[i])
     mfp_df = pd.DataFrame(
         mfp_matrix, columns=[f"morg_count_fp_{i}" for i in range(ncounts)]
     ).astype("int8")
-    
+
     for i, fingerprint in enumerate(tt_fingerprints):
         ConvertToNumpyArray(fingerprint, tt_matrix[i])
     tt_df = pd.DataFrame(
         tt_matrix, columns=[f"tt_fp_{i}" for i in range(ncounts)]
     ).astype("int8")
-    
+
     merged_df = pd.concat([df, mfp_df, tt_df], axis=1)
     return merged_df
 
@@ -148,6 +175,7 @@ def calculate_descriptors(unique_seqs, calculation_function):
         for seq, desc in unique_descriptors.items():
             descriptor_dict[name][seq] = desc.get(name, None)
     return descriptor_dict
+
 
 def protein_feature_generation(df):
     unique_seqs = set(df["sequence"])
@@ -173,12 +201,16 @@ def protein_feature_generation(df):
     ctd_df["sequence"] = ctd_df.index
 
     # Calculate descriptors using propy.Autocorrelation library
-    unique_descriptors = calculate_descriptors(unique_seqs, propy.Autocorrelation.CalculateGearyAutoTotal)
+    unique_descriptors = calculate_descriptors(
+        unique_seqs, propy.Autocorrelation.CalculateGearyAutoTotal
+    )
     autocorr_df = pd.DataFrame.from_dict(unique_descriptors)
     autocorr_df["sequence"] = autocorr_df.index
 
     # Calculate descriptors using propy.AAComposition library
-    unique_descriptors = calculate_descriptors(unique_seqs, propy.AAComposition.CalculateAAComposition)
+    unique_descriptors = calculate_descriptors(
+        unique_seqs, propy.AAComposition.CalculateAAComposition
+    )
     aa_df = pd.DataFrame.from_dict(unique_descriptors)
     aa_df["sequence"] = aa_df.index
 
@@ -225,7 +257,17 @@ def predict_from_chembl_uniprot(df):
     return df
 
 
+# For a dataframe containing a column "compound_smiles" in smiles format, and a column "sequence" of protein sequences for all drug-target pairs
 def predict_from_fasta_smiles(df):
+    df = fingerprint_generation(df, 300)
+    df = protein_feature_generation(df)
+    df = autogluon_predict(df)
+    return df
+
+
+# For a text file of compounds in smiles notation, and a separate text file of protein sequences. Each should be a single column with no header.
+def predict_from_txt_files(sequences_path, smiles_path):
+    df = drug_target_pairs(sequences_path, smiles_path)
     df = fingerprint_generation(df, 300)
     df = protein_feature_generation(df)
     df = autogluon_predict(df)
