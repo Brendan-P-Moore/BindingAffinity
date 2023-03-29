@@ -1,4 +1,4 @@
-# Drug-Target-Interaction-Predictor
+# Drug-Protein-pKd-Predictor
 Predicts the dissociation coefficients between drug-protein (target) pairs using molecular fingerprints and physicochemical protein properties. The molecular fingerprints used are the morgan 300 countvector fingerprint, and 300 topological torsion countvector fingerprint.
 
 
@@ -16,7 +16,7 @@ Predicts the dissociation coefficients between drug-protein (target) pairs using
 1. Clone the GitHub repository.
 
 ```
-git clone https://github.com/Brendan-P-Moore/Drug-Target-Interaction-Predictor
+git clone https://github.com/Brendan-P-Moore/Drug-Protein-pKd-Predictor
 
 ```
 2. Set the current working directory to the Drug-Protein-pKd-Predictor folder.
