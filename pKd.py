@@ -248,7 +248,7 @@ def autogluon_predict(df):
 
 
 # For a dataframe containing a column "compound_id" in chembl format, and a column "target_id" in UniprotID format
-def predict_from_chembl_uniprot(df):
+def predict_pKd_from_chembl_uniprot(df):
     df = uniprot_to_fasta(df)
     df = chembl_to_smiles(df)
     df = fingerprint_generation(df, 300)
@@ -258,7 +258,7 @@ def predict_from_chembl_uniprot(df):
 
 
 # For a dataframe containing a column "compound_smiles" in smiles format, and a column "sequence" of protein sequences for all drug-target pairs
-def predict_from_fasta_smiles(df):
+def predict_pKd_from_fasta_smiles(df):
     df = fingerprint_generation(df, 300)
     df = protein_feature_generation(df)
     df = autogluon_predict(df)
@@ -266,7 +266,7 @@ def predict_from_fasta_smiles(df):
 
 
 # For a text file of compounds in smiles notation, and a separate text file of protein sequences. Each should be a single column with no header.
-def predict_from_txt_files(sequences_path, smiles_path):
+def predict_pKd_from_txt(sequences_path, smiles_path):
     df = drug_target_pairs(sequences_path, smiles_path)
     df = fingerprint_generation(df, 300)
     df = protein_feature_generation(df)
