@@ -1,0 +1,7 @@
+autogluon==0.7.0
+chembl_webresource_client == 0.10.8
+biopython==1.81
+propy3 == 1.1.1
+peptides == 0.3.1
+rdkit==2022.9.5
+
