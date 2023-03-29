@@ -7,6 +7,8 @@ from multiprocessing import Pool, cpu_count
 import joblib
 from joblib import dump, load
 import os
+import tqdm
+from tqdm import tqdm
 
 import rdkit
 from rdkit import Chem
@@ -38,7 +40,7 @@ def uniprot_to_fasta(df):
     uniprot_ids = df["target_id"].drop_duplicates().tolist()
     baseUrl = "https://rest.uniprot.org/uniprotkb/"
     seq = []
-    for id in uniprot_ids:
+    for id in tqdm(uniprot_ids, desc="Converting uniprot IDs to protein sequences"):
         currentUrl = baseUrl + id + ".fasta"
         response = r.get(currentUrl)
         Seq = StringIO(response.text)
@@ -82,7 +84,8 @@ def chembl_to_smiles(df):
     ]
     num_processes = cpu_count()
     with Pool(num_processes) as pool:
-        results = pool.map(process_batch, chembl_id_batches)
+        for result in tqdm(pool.imap_unordered(process_batch_with_progress, chembl_id_batches), total=len(chembl_id_batches)):
+            results.append(result)
     merged_results = {}
     for d in results:
         merged_results.update(d)
@@ -103,9 +106,7 @@ def smiles_to_rdkit_mol(df):
     return mols
 
 
-def fingerprint_generation(
-    df, ncounts
-):  # returns a df with molecular fingerprints, ncounts is the number of count vectors.
+def fingerprint_generation(df, ncounts):  # returns a df with molecular fingerprints, ncounts is the number of count vectors.
     mols = smiles_to_rdkit_mol(df)
     # fingerprint generation
     mfpgen = rdFingerprintGenerator.GetMorganGenerator(
@@ -116,25 +117,28 @@ def fingerprint_generation(
     )  # TopologicalTorsion300 Fingerprint
     mfp_matrix = np.zeros((len(mols), ncounts), dtype=int)
     tt_matrix = np.zeros((len(mols), ncounts), dtype=int)
-    mfp_fingerprints = [mfpgen.GetCountFingerprint(mol) for mol in mols]
-    tt_fingerprints = [ttgen.GetCountFingerprint(mol) for mol in mols]
+    mfp_fingerprints = [mfpgen.GetCountFingerprint(mol) for mol in tqdm(mols, desc="Generating Morgan fingerprints", unit=" molecule")]
+    tt_fingerprints = [ttgen.GetCountFingerprint(mol) for mol in tqdm(mols, desc="Generating Topological Torsion fingerprints", unit=" molecule")]
+    
     for i, fingerprint in enumerate(mfp_fingerprints):
         ConvertToNumpyArray(fingerprint, mfp_matrix[i])
     mfp_df = pd.DataFrame(
         mfp_matrix, columns=[f"morg_count_fp_{i}" for i in range(ncounts)]
     ).astype("int8")
+    
     for i, fingerprint in enumerate(tt_fingerprints):
         ConvertToNumpyArray(fingerprint, tt_matrix[i])
     tt_df = pd.DataFrame(
         tt_matrix, columns=[f"tt_fp_{i}" for i in range(ncounts)]
     ).astype("int8")
+    
     merged_df = pd.concat([df, mfp_df, tt_df], axis=1)
     return merged_df
 
 
 def calculate_descriptors(unique_seqs, calculation_function):
     unique_descriptors = {}
-    for seq in unique_seqs:
+    for seq in tqdm(unique_seqs, desc="Calculating propy package descriptors"):
         unique_descriptors[seq] = calculation_function(seq)
     descriptor_names = set().union(*unique_descriptors.values())
     descriptor_dict = {}
@@ -149,7 +153,7 @@ def protein_feature_generation(df):
 
     # Calculate descriptors using peptides library with full code, different syntax required.
     unique_descriptors = {}
-    for seq in unique_seqs:
+    for seq in tqdm(unique_seqs, desc="Calculating all peptide package descriptors"):
         unique_descriptors[seq] = peptides.Peptide(seq).descriptors()
 
     descriptor_names = set().union(*unique_descriptors.values())
@@ -163,20 +167,17 @@ def protein_feature_generation(df):
 
     # Calculate descriptors using propy.CTD library
     unique_descriptors = calculate_descriptors(unique_seqs, propy.CTD.CalculateCTD)
+
     ctd_df = pd.DataFrame.from_dict(unique_descriptors)
     ctd_df["sequence"] = ctd_df.index
 
     # Calculate descriptors using propy.Autocorrelation library
-    unique_descriptors = calculate_descriptors(
-        unique_seqs, propy.Autocorrelation.CalculateGearyAutoTotal
-    )
+    unique_descriptors = calculate_descriptors(unique_seqs, propy.Autocorrelation.CalculateGearyAutoTotal)
     autocorr_df = pd.DataFrame.from_dict(unique_descriptors)
     autocorr_df["sequence"] = autocorr_df.index
 
     # Calculate descriptors using propy.AAComposition library
-    unique_descriptors = calculate_descriptors(
-        unique_seqs, propy.AAComposition.CalculateAAComposition
-    )
+    unique_descriptors = calculate_descriptors(unique_seqs, propy.AAComposition.CalculateAAComposition)
     aa_df = pd.DataFrame.from_dict(unique_descriptors)
     aa_df["sequence"] = aa_df.index
 
@@ -188,7 +189,7 @@ def protein_feature_generation(df):
 
     df["sequence_length"] = df["sequence"].str.len()
 
-    return df.copy()
+    return df
 
 
 def autogluon_predict(df):
@@ -203,9 +204,11 @@ def autogluon_predict(df):
     autogluon_folds = 10
     model = TabularPredictor.load(f"autogluon_models/fold0/")
     pred_autogluon = model.predict(df[features_autogluon])
-    for f in range(1, autogluon_folds):
-        model = TabularPredictor.load(f"autogluon_models/fold{f}/")
-        pred_autogluon += model.predict(df[features_autogluon])
+    with tqdm(total=autogluon_folds - 1, desc="Autogluon Model Predictions") as pbar:
+        for f in range(1, autogluon_folds):
+            model = TabularPredictor.load(f"autogluon_models/fold{f}/")
+            pred_autogluon += model.predict(df[features_autogluon])
+            pbar.update(1)
     pred_autogluon /= autogluon_folds
     df["predicted_pKd"] = pred_autogluon
     return df
