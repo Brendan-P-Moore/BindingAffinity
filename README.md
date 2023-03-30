@@ -16,13 +16,13 @@ BindingAffinity utilizes proteochemometric (PCM) modeling to predict the binding
 1. Clone the GitHub repository.
 
 ```
-git clone https://github.com/Brendan-P-Moore/Drug-Protein-pKd-Predictor
+git clone https://github.com/Brendan-P-Moore/BindingAffinity
 
 ```
-2. Set the current working directory to the Drug-Protein-pKd-Predictor folder.
+2. Set the current working directory to the BindingAffinity folder.
 
 ```
-cd Drug-Protein-pKd-Predictor
+cd BindingAffinity
 
 ```
 3. Install the required packages listed in the dependencies section and requirements file.
@@ -31,7 +31,7 @@ cd Drug-Protein-pKd-Predictor
 pip install -r requirements.txt
 
 ```
-4. Import the AMPTransformer python file, and the predict function.
+4. Import the pKd python file, and the predict function.
 
 ```
 import pKd
