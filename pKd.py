@@ -234,15 +234,15 @@ def autogluon_predict(df):
         "compound_smiles",
     ]
     features_autogluon = [c for c in df.columns if c not in exclude_autogluon]
-    autogluon_folds = 10
+    autogluon_models = 10
     model = TabularPredictor.load(f"autogluon_models/fold0/")
     pred_autogluon = model.predict(df[features_autogluon])
-    with tqdm(total=autogluon_folds - 1, desc="Autogluon Model Predictions") as pbar:
-        for f in range(1, autogluon_folds):
+    with tqdm(total=autogluon_models - 1, desc="Autogluon Model Predictions") as pbar:
+        for f in range(1, autogluon_models):
             model = TabularPredictor.load(f"autogluon_models/fold{f}/")
             pred_autogluon += model.predict(df[features_autogluon])
             pbar.update(1)
-    pred_autogluon /= autogluon_folds
+    pred_autogluon /= autogluon_models
     df["predicted_pKd"] = pred_autogluon
     return df
 
