@@ -1,5 +1,5 @@
-# Drug-Protein-pKd-Predictor
-Predicts the dissociation coefficients between drug-protein (target) pairs using molecular fingerprints and physicochemical protein properties. The molecular fingerprints used are the morgan 300 countvector fingerprint, and 300 topological torsion countvector fingerprint.
+# BindingAffinity
+BindingAffinity utilizes proteochemometric (PCM) modeling to predict the binding affinity for drug-protein pairs. In this context, the binding affinity is the -log(Kd) (pKd), where Kd is the dissociation constant for a drug-protein pair. The model was trained using molecular fingerprints combined with physicochemical protein descriptors, and was tuned and tested on chemically dissimilar datasets (1). The task of predicting chemically dissimilar drug-protein pairs is much more challenging and realistic, as it requires the model to generalize to novel chemical space where new drug-protein interactions can be discovered (1). This predictor improves on the baseline put forward by Guvenilir and Doğan. Details can be found in the description section.
 
 
 # Dependencies
@@ -47,3 +47,13 @@ from pKd import predict_pKd_from_txt
 predict_pKd_from_txt(sequences_path,smiles_path)
 
 ```
+
+
+# Description
+
+
+
+
+# References
+
+1) Atas Guvenilir, H., Doğan, T. How to approach machine learning-based prediction of drug/compound–target interactions. J Cheminform 15, 16 (2023). https://doi.org/10.1186/s13321-023-00689-w
