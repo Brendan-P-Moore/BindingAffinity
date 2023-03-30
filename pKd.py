@@ -258,7 +258,7 @@ def predict_pKd_from_chembl_uniprot(df):
 
 
 # For a dataframe containing a column "compound_smiles" in smiles format, and a column "sequence" of protein sequences for all drug-target pairs
-def predict_pKd_from_fasta_smiles(df):
+def predict_pKd_from_sequence_smiles(df):
     df = fingerprint_generation(df, 300)
     df = protein_feature_generation(df)
     df = autogluon_predict(df)
