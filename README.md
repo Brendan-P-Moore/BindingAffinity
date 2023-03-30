@@ -93,3 +93,5 @@ predicted_pKd = prediction_dataframe['predicted_pKd']
 # References
 
 1) Atas Guvenilir, H., Doğan, T. How to approach machine learning-based prediction of drug/compound–target interactions. J Cheminform 15, 16 (2023). https://doi.org/10.1186/s13321-023-00689-w
+
+2) https://github.com/hevalatas/ProtBENCH
