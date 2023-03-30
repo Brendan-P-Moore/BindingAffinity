@@ -38,14 +38,14 @@ pip install -r requirements.txt
 
 ```
 import pKd
-from pKd import predict_pKd_from_txt
+from pKd import pKd_from_txt
 
 ```
 
 2. The prediction can be made for every combination of peptide and compound found in the two text files by specifying the absolute path to the files. To avoid memory issues, limit the file sizes to less than 50 proteins, and less than 1000 compounds per prediction. This prediction returns a dataframe with all features used to predict the binding affinity, and a column titled "predicted_pKd" with the predicted -log(Kd) value.
 
 ```
-prediction_dataframe = predict_pKd_from_txt(sequences_path,smiles_path)
+prediction_dataframe = pKd_from_txt(sequences_path,smiles_path)
 
 predicted_pKd = prediction_dataframe['predicted_pKd']
 
@@ -54,7 +54,7 @@ predicted_pKd = prediction_dataframe['predicted_pKd']
 Using the example files provided in this repository:
 
 ```
-prediction_dataframe = predict_pKd_from_txt("examples/sequence.txt","examples/smiles.txt")
+prediction_dataframe = pKd_from_txt("examples/sequence.txt","examples/smiles.txt")
 
 predicted_pKd = prediction_dataframe['predicted_pKd']
 
@@ -64,9 +64,9 @@ predicted_pKd = prediction_dataframe['predicted_pKd']
 
 ```
 import pKd
-from pKd import predict_pKd_from_sequence_smiles
+from pKd import pKd_from_sequence_smiles
 
-prediction_dataframe = predict_pKd_from_sequence_smiles(df)
+prediction_dataframe = pKd_from_sequence_smiles(df)
 
 predicted_pKd = prediction_dataframe['predicted_pKd']
 
@@ -76,11 +76,11 @@ Binding affinities can also be predicted from a dataframe of drugs in chembl id 
 
 ```
 import pKd
-from pKd import predict_pKd_from_sequence_smiles
+from pKd import pKd_from_chembl_uniprot
 
 df = pd.read_csv('test_data/test_uniprot_chembl.csv')
 
-prediction_dataframe = predict_pKd_from_chembl_uniprot(df)
+prediction_dataframe = pKd_from_chembl_uniprot(df)
 
 predicted_pKd = prediction_dataframe['predicted_pKd']
 
