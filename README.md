@@ -54,7 +54,7 @@ predicted_pKd = prediction_dataframe['predicted_pKd']
 Using the example files provided in this repository:
 
 ```
-prediction_dataframe = pKd_from_txt("examples/sequence.txt","examples/smiles.txt")
+prediction_dataframe = pKd_from_txt("examples/sequences.txt","examples/smiles.txt")
 
 predicted_pKd = prediction_dataframe['predicted_pKd']
 
