@@ -104,8 +104,9 @@ BindingAffinity is a machine learning model for the prediction of drug-protein b
 Splits were prepared in this way for each of the 10 protein families. The fully dissimilar split proved much more challenging for predictors, as it requires more generalizable predictions. This testing scenario is also more realistic for cases where novel drug-protein pairs are desired.
 This package combines all 10 protein family training sets for one larger training set spanning a greater range of chemical space. It then trains 10 different autogluon models, each one tuned on a different withheld family of proteins. The trained autogluon models are ensembles of PyTorch tabular networks and lightgbm models. Because different protein families have dissimilar drug-protein interactions, this withheld tuning data is suitable as a cross-validation dataset for the chemically dissimilar testing data. The figure below summarizes this methodology.
 
+<p align="center">
 <img src="training_scheme_BindingAffinity.png" alt= “” width="540" height="420">
-
+</p>
 
 This predictor shows an improvement over the baseline random forest models trained by Doğan and Guvenilir, with an improvement of 0.062 RMSE, and 0.17 higher spearman correlation coefficient compared with the best single model of Guvenilir and Doğan. This shows that with chemically dissimilar tuning data, machine learning models can better predict novel drug-protein binding affinities, despite the use of easy to generate molecular fingerprints and physicochemical descriptors. The table below shows a detailed comparison of the best overall baseline model from Guvenilir and Doğan, a baseline random forest model trained on the molecular and protein descriptors used in this work, and the final predictor. The enzyme family tuned ensemble model greatly outperforms the baseline models in terms of spearman rank correlation on all enzyme families. The root mean squared error was also lower overall for the tuned model, although epigenetic regulators and ion-channels error was lower in the baseline model.
 
