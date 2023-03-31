@@ -34,7 +34,6 @@ pip install -r requirements.txt
 
 # Prediction Guide
 
-Currently requires GPU for prediction. Will update with CPU version shortly.
 
 1. Import the pKd python file. To predict from two text files, one a file with a single protein sequence on each line, and one a file with a single smiles string on each line, import the "predict_pKd_from_txt" function. Example sequences and smiles text files can be found in the "Examples" folder in this repository.
 
@@ -114,12 +113,12 @@ This predictor shows an improvement over the baseline random forest models train
 |------------------------------------|---------|-----------|-----------------------|------------|-------------|--------------------|-------|-----------------|-----------------------|--------------|--------------|
 | Guvenilir   Random Forest          | 0.302   | 0.413     | 0.445                 | 0.280      | 0.153       | 0.341              | 0.349 | 0.079           | 0.266                 | 0.439        | 0.249        |
 | Random Forest Baseline             | 0.393   | 0.352     | 0.492                 | 0.451      | 0.231       | 0.299              | 0.329 | 0.145           | 0.339                 | 0.352        | 0.225        |
-| Autogluon Tuned                    | 0.476   | 0.449     | 0.465                 | 0.472      | 0.291       | 0.425              | 0.437 | 0.256           | 0.320                 | 0.533        | 0.372        |
+| Autogluon Tuned                    | 0.474   | 0.439     | 0.473                 | 0.462      | 0.292       | 0.422              | 0.457 | 0.251           | 0.323                 | 0.520        | 0.374        |
 |                                    |         |           |                       |            |             |                    |       |                 |                       |              |              |
 | Root Mean Squared Error            | Overall | Proteases | Epigenetic regulators | Hydrolases | Ion-channel | membrane receptors | other | oxidoreductases | transcription-factors | transferases | transporters |
 | Guvenilir   Random Forest          | 1.230   | 1.207     | 0.975                 | 1.676      | 1.144       | 1.229              | 1.347 | 1.271           | 1.150                 | 1.132        | 1.173        |
 | Random Forest Baseline             | 1.251   | 1.297     | 0.953                 | 1.368      | 1.110       | 1.313              | 1.252 | 1.208           | 1.150                 | 1.247        | 1.196        |
-| Autogluon Tuned                    | 1.168   | 1.171     | 1.041                 | 1.304      | 1.155       | 1.206              | 1.208 | 1.115           | 1.098                 | 1.119        | 1.100        |
+| Autogluon Tuned                    | 1.171   | 1.175     | 1.044                 | 1.308      | 1.156       | 1.206              | 1.207 | 1.117           | 1.096                 | 1.126        | 1.101        |
 
 Another key issue with proteochemometric (PCM) based binding affinity predictors is the tendency to ignore protein features and over-rely on molecular features. Since lightgbm models played an important role in the final predictor ensemble, the feature importance of lightgbm models trained using the scheme shown above were investigated. The figure below shows the top 20 feature importance of lightgbm models tuned on (A): ion-channels, (B): membrane receptors, (C): transcription factors, and (D): transferases. We can see that while a few molecular fingerprint features were typically most important, the top 20 features include a good mix of protein features and molecular features. Features labelled morg_count are from the morgan300 count vector, and tt_count are from the topological torsion 300 count vector. Features starting with GearyAuto are geary autocorrelation features generated suing propy3, and the remaining features are either peptides/propy3 descriptors, or in the case of single letters amino acid distribution features.
 
