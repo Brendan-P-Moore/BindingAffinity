@@ -92,6 +92,8 @@ predicted_pKd = prediction_dataframe['predicted_pKd']
 predicted_pKd.to_csv('pKd_predictions.csv',index=False)
 
 ```
+
+For a worked example in a colab notebook: https://colab.research.google.com/drive/1YDAUlV90x_Ghar19_IIucAQQDs-w8H-Q?usp=sharing
 # Description
 
 BindingAffinity is a machine learning model for the prediction of drug-protein binding affinities. It was trained on the newly published benchmark datasets produced by Guvenilir and Doğan (1). Guvenilir and Doğan generated 3 different splits of train/test data for 10 different protein families (1):
