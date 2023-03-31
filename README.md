@@ -103,6 +103,7 @@ This predictor shows an improvement over the baseline random forest models train
 
 Another key issue with proteochemometric (PCM) based binding affinity predictors is the tendency to ignore protein features and over-rely on molecular features. Since lightgbm models played an important role in the final predictor ensemble, the feature importance of lightgbm models trained using the scheme shown above were investigated. The figure below shows the top 20 feature importance of lightgbm models tuned on (A): ion-channels, (B): membrane receptors, (C): transcription factors, and (D): transferases. We can see that while a few molecular fingerprint features were typically most important, the top 20 features include a good mix of protein features and molecular features. Features labelled morg_count are from the morgan300 count vector, and tt_count are from the topological torsion 300 count vector. Features starting with GearyAuto are geary autocorrelation features generated suing propy3, and the remaining features are either peptides/propy3 descriptors, or in the case of single letters amino acid distribution features.
 
+![alt text](https://github.com/Brendan-P-Moore/BindingAffinity/blob/main/feature_importance_lightgbm_BindingAffinity.png?raw=true)
 # References
 
 1) Atas Guvenilir, H., Doğan, T. How to approach machine learning-based prediction of drug/compound–target interactions. J Cheminform 15, 16 (2023). https://doi.org/10.1186/s13321-023-00689-w
