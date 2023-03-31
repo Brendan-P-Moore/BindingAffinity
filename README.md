@@ -34,6 +34,8 @@ pip install -r requirements.txt
 
 # Prediction Guide
 
+Currently requires GPU for prediction. Will update with CPU version shortly.
+
 1. Import the pKd python file. To predict from two text files, one a file with a single protein sequence on each line, and one a file with a single smiles string on each line, import the "predict_pKd_from_txt" function. Example sequences and smiles text files can be found in the "Examples" folder in this repository.
 
 ```
