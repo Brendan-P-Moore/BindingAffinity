@@ -104,7 +104,7 @@ BindingAffinity is a machine learning model for the prediction of drug-protein b
 Splits were prepared in this way for each of the 10 protein families. The fully dissimilar split proved much more challenging for predictors, as it requires more generalizable predictions. This testing scenario is also more realistic for cases where novel drug-protein pairs are desired.
 This package combines all 10 protein family training sets for one larger training set spanning a greater range of chemical space. It then trains 10 different autogluon models, each one tuned on a different withheld family of proteins. The trained autogluon models are ensembles of PyTorch tabular networks and lightgbm models. Because different protein families have dissimilar drug-protein interactions, this withheld tuning data is suitable as a cross-validation dataset for the chemically dissimilar testing data. The figure below summarizes this methodology.
 
-<img src="training_scheme_BindingAffinity.png" alt= “” width="90" height="70">
+<img src="training_scheme_BindingAffinity.png" alt= “” width="270" height="210">
 
 ![alt text](https://github.com/Brendan-P-Moore/BindingAffinity/blob/main/training_scheme_BindingAffinity.png?raw=true)
 
