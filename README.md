@@ -72,7 +72,7 @@ predicted_pKd = prediction_dataframe['predicted_pKd']
 
 ```
 
-Binding affinities can also be predicted from a dataframe of drugs in chembl id format and proteins in uniprot id format. Below is a worked example using the test data which is found in this format. This prediction will be much slower, as the chembl ids need to be converted to SMILES, and the uniprot ids need to be converted to sequences.
+Binding affinities can also be predicted from a dataframe of drugs in chembl id format and proteins in uniprot id format. Below is a worked example using the test data which is found in this format. This prediction will be much slower, as the chembl ids need to be converted to SMILES, and the uniprot ids need to be converted to sequences. The uniprot id column must be named 'target_id', and the chembl id column must be named 'compound_id'.
 
 ```
 import pKd
@@ -85,7 +85,12 @@ prediction_dataframe = pKd_from_chembl_uniprot(df)
 predicted_pKd = prediction_dataframe['predicted_pKd']
 
 ```
+4. To save the dataframe, use the Pandas df.to_csv('filename') function. Specify index=False if you do not want to export the row index as well as the predictions.
 
+```
+predicted_pKd.to_csv('pKd_predictions.csv',index=False)
+
+```
 # Description
 
 BindingAffinity is a machine learning model for the prediction of drug-protein binding affinities. It was trained on the newly published benchmark datasets produced by Guvenilir and Doğan (1). Guvenilir and Doğan generated 3 different splits of train/test data for 10 different protein families (1):
