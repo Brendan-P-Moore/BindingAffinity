@@ -100,7 +100,7 @@ This package combines all 10 protein family training sets for one larger trainin
 
 
 
-This predictor shows a large improvement over the baseline random forest models presented by Doğan and Guvenilir.
+This predictor shows an improvement over the baseline random forest models trained by Doğan and Guvenilir, with an improvement of 0.07 RMSE, and 0.17 higher spearman correlation coefficient compared with the best single model of Guvenilir and Doğan. This shows that the use of neural nets and gradient boosted tree methods, in combination with chemically dissimilar tuning data, machine learning models can better predict novel drug-protein binding affinities, despite the use of simple molecular fingerprints and physicochemical descriptors in this work. The table below shows a detailed comparison of the best overall baseline model from Guvenilir and Doğan, a baseline random forest model trained on the molecular and protein descriptors used in this work, and the final predictor.
 # References
 
 1) Atas Guvenilir, H., Doğan, T. How to approach machine learning-based prediction of drug/compound–target interactions. J Cheminform 15, 16 (2023). https://doi.org/10.1186/s13321-023-00689-w
