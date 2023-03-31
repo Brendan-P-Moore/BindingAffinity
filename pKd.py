@@ -37,6 +37,7 @@ from autogluon.tabular import FeatureMetadata
 from autogluon.tabular import TabularDataset, TabularPredictor
 
 
+# generate a dataframe of compound-protein pairs from two text files, one a text file of smiles strings, one a text file of protein sequences.
 def drug_target_pairs(sequences_path, smiles_path):
     fasta_df = pd.read_csv(os.path.abspath(sequences_path), names=["sequence"])
 
@@ -49,7 +50,7 @@ def drug_target_pairs(sequences_path, smiles_path):
     df = pd.DataFrame(combinations, columns=["sequence", "compound_smiles"])
     return df
 
-
+# Convert protein uniprot ids to sequences for feature generation.
 def uniprot_to_fasta(df):
     uniprot_ids = df["target_id"].drop_duplicates().tolist()
     baseUrl = "https://rest.uniprot.org/uniprotkb/"
@@ -73,7 +74,7 @@ def uniprot_to_fasta(df):
     df.reset_index(drop=True, inplace=True)
     return df
 
-
+# for converting chembl id to smiles strings in batches, avoids timeout errors using the chembl web api.
 def process_batch(batch):
     molecules = new_client.molecule.filter(molecule_chembl_id__in=batch).only(
         "molecule_chembl_id", "molecule_structures"
@@ -89,7 +90,7 @@ def process_batch(batch):
             chembl_ids_with_smiles.append(molecule["molecule_chembl_id"])
     return dict(zip(chembl_ids_with_smiles, smiles))
 
-
+# convert compound chembl ids to smiles strings for molecular feature generations, multiprocessing to speed up process.
 def chembl_to_smiles(df):
     chembl_ids = df["compound_id"].unique().tolist()
     batch_size = 500
@@ -112,18 +113,18 @@ def chembl_to_smiles(df):
     df.reset_index(drop=True, inplace=True)
     return df
 
-
+# generate a molecule from a smiles string.
 def smi_to_mol(smi):
     return Chem.MolFromSmiles(smi)
 
-
+# multiprocess the smiles to molecule conversion to speed up the process.
 def smiles_to_rdkit_mol(df):
     with Pool(cpu_count()) as p:
         mols = p.map(smi_to_mol, df["compound_smiles"])
     mols = [mol for mol in mols if mol is not None]
     return mols
 
-
+# generate molecular fingerprints (morgan300, toptorsion300) from smiles strings.
 def fingerprint_generation(
     df, ncounts
 ):  # returns a df with molecular fingerprints, ncounts is the number of count vectors.
@@ -163,7 +164,7 @@ def fingerprint_generation(
     merged_df = pd.concat([df, mfp_df, tt_df], axis=1)
     return merged_df
 
-
+# for calculating propy protein descriptors.
 def calculate_descriptors(unique_seqs, calculation_function):
     unique_descriptors = {}
     for seq in tqdm(unique_seqs, desc="Calculating propy package descriptors"):
@@ -176,7 +177,7 @@ def calculate_descriptors(unique_seqs, calculation_function):
             descriptor_dict[name][seq] = desc.get(name, None)
     return descriptor_dict
 
-
+#function to generate all required protein descriptors for model training.
 def protein_feature_generation(df):
     unique_seqs = set(df["sequence"])
 
@@ -224,7 +225,7 @@ def protein_feature_generation(df):
 
     return df
 
-
+# Predict pKd values using autogluon tabular predictors on the drug-protein pairs.
 def autogluon_predict(df):
     exclude_autogluon = [
         "compound_id",
