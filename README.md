@@ -88,6 +88,13 @@ predicted_pKd = prediction_dataframe['predicted_pKd']
 
 # Description
 
+BindingAffinity is a machine learning model for the prediction of drug-protein binding affinities. It was trained on the newly published benchmark datasets produced by Guvenilir and Doğan (1). Guvenilir and Doğan generated 3 different splittings of train/test data for 10 different protein families (1):
+
+1. Randomly split data, which produces highly overoptimisitic testing results
+2. A dissimilar compound split, in which only dissimilar drug molecules were included in the testing data.
+3. A fully dissimilar split, where both proteins and compounds in the test set were not chemically similar to the training data.
+
+Splits were prepared in this way for each of the 10 protein families. The fully dissimilar split proved much more challenging for predictors, as it requires more generalizable predictions. This testing scenario is also more realistic for cases where novel drug-protein pairs are desired. 
 
 
 # References
